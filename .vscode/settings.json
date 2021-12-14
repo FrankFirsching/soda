@@ -1,0 +1,22 @@
+{
+    "blender.addon.loadDirectory": "./soda",
+    "blender.addon.moduleName": "soda",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.pycodestyleArgs": [
+        "--max-line-length=120"
+    ],
+    "spellright.language": [
+        "en_US"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext"
+    ],
+    "editor.rulers": [
+        120
+    ],
+    "reflow.preferredLineLength": 120,
+}
