@@ -25,7 +25,7 @@ jobs:
       max-parallel: 4
       matrix:
         blender-version: ["3.0"]
-        os: ubuntu-latest
+        os: [ubuntu-latest]
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
