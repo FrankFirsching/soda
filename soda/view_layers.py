@@ -18,6 +18,7 @@
 import bpy
 
 def setup_global_soda_settings(context):
+    context.scene.use_nodes = True
     context.scene.render.image_settings.file_format = "OPEN_EXR_MULTILAYER"
 
 def layer_name(light):
