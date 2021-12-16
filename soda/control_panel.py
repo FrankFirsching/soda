@@ -38,4 +38,6 @@ class SodaMainPanel(SodaPanel, bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         layout.operator(ops.CreateViewLayers.bl_idname)
-        layout.operator(ops.StartNatron.bl_idname)
+        row = layout.row(align=True)
+        row.operator(ops.UpdateNatron.bl_idname)
+        row.operator(ops.RecreateNatron.bl_idname)

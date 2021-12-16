@@ -29,3 +29,4 @@ class PreferencesPanel(bpy.types.AddonPreferences):
     def draw(self, context):
         layout = self.layout.column()
         layout.prop(self.soda, "natron_executable")
+        layout.prop(self.soda, "project_comp_dir")

@@ -28,7 +28,8 @@ def findReader(filename):
     avgPos = [0, 0]
     numChildren = 0
     for child in app.getChildren():
-        if child.isReaderNode() and child.getParam("filename").get() == filename:
+        if child.isReaderNode() and child.getScriptName() == "soda_reader":
+            child.getParam("filename").set(filename) # Update the filename (might have changed in blender)
             return child
         childPos = child.getPosition()
         avgPos[0] += childPos[0]
@@ -42,7 +43,7 @@ def findReader(filename):
         avgPos[1] = 500
     node = app.createReader(filename)
     name = os.path.basename(filename)
-    node.setScriptName(name)
+    node.setScriptName("soda_reader")
     node.setLabel(name)
     node.setPosition(avgPos[0], avgPos[1]-500)
     return node
@@ -53,7 +54,8 @@ def findNode(name, pluginId, group=None):
     node = app.getNode(name) if group is None else group.getNode(name)
     if node is None:
         node = app.createNode(pluginId, group=group)
-        node.setScriptName(name)
+        if not node.setScriptName(name):
+            raise RuntimeError("Couldn't set node script name: "+name)
         node.setLabel(name.replace("soda_", ""))
     return node
 
@@ -68,10 +70,27 @@ def getLayers(reader):
     return usedLayers
 
 
+def removeNode(nodeName, group):
+    # TODO: Remove the nodes if we find out, how to do this though Natron's API
+    # For now, just move them to the side and disconnect
+    node = group.getNode(nodeName)
+    if node is not None:
+        for i in range(node.getMaxInputCount()):
+            node.disconnectInput(i)
+        position = node.getPosition()
+        node.setPosition(position[0]-1000, position[1])
+
+
+def removeLight(l, group):
+    removeNode(l+"_shuffle", group)
+    removeNode(l+"_color", group)
+    removeNode(l+"_apply", group)
+
+
 def setupLight(l, position, reader, group):
     hSpacing = 150
     vSpacing = 75
-    shuffleNode = findNode(l, "net.sf.openfx.ShufflePlugin", group)
+    shuffleNode = findNode(l+"_shuffle", "net.sf.openfx.ShufflePlugin", group)
     shuffleNode.setPosition(position[0], position[1])
     if reader is not None:
         shuffleNode.connectInput(0, reader)
@@ -92,7 +111,10 @@ def setupLight(l, position, reader, group):
     return applyColorNode
 
 
-def setupComp(exrFile):
+def setupComp(exrFile, sourceFile):
+    global app
+    if sourceFile != "":
+        app = app.loadProject(sourceFile)
     hSpacing = 300
     vSpacing = 200
 
@@ -102,9 +124,10 @@ def setupComp(exrFile):
     layers = getLayers(reader)
     numLayers = len(layers)
 
-    lightMixerNode = findNode("lightMixer", "fr.inria.built-in.Group")
+    lightMixerNode = findNode("soda_lightMixer", "fr.inria.built-in.Group")
     lightMixerParams = lightMixerNode.createPageParam("mixer", "Mixer")
     lightMixerNode.setPosition(readerPos[0], readerPos[1]+vSpacing)
+    lightMixerNode.disconnectInput(0)
     lightMixerNode.connectInput(0, reader)
     lightMixerInput = findNode("Input1", None, lightMixerNode)
     lightMixerOutput = findNode("Output1", None, lightMixerNode)
@@ -121,29 +144,50 @@ def setupComp(exrFile):
     lightMixerOutput.disconnectInput(0)
     lightMixerOutput.connectInput(0, mergeNode)
 
+    # Remove the old parameters of lights, that might have been deleted.
+    for p in lightMixerNode.getParams():
+        layer_name = p.getScriptName()
+        if not layer_name.startswith("soda_"):
+            continue
+        if layer_name.endswith("col") or layer_name.endswith("_int"):
+            layer_name = layer_name[:-4]
+        if not layer_name in layers:
+            app.writeToScriptEditor("Removing: "+layer_name)
+            lightMixerNode.removeParam(p)
+            removeLight(layer_name, lightMixerNode)
+
+    # Setup all remaining lights and their parameters
     for i, l in enumerate(layers):
-        # Setup a light
-        groupParam = lightMixerNode.createGroupParam(l, l.replace("soda_", ""))
-        groupParam.setOpened(True)
-        lightMixerParams.addParam(groupParam)
-        param = lightMixerNode.createColorParam(l+"_col", "Color", False)
-        param.setMinimum(0)
-        param.setDisplayMaximum(1)
-        param.set(1, 1, 1, 1)
-        param.setDefaultValue(1, 0)
-        param.setDefaultValue(1, 1)
-        param.setDefaultValue(1, 2)
-        groupParam.addParam(param)
-        param = lightMixerNode.createDoubleParam(l+"_int", "Intensity")
-        param.setMinimum(0)
-        param.setDisplayMaximum(10)
-        param.set(1)
-        param.setDefaultValue(1)
-        groupParam.addParam(param)
+        
+        app.writeToScriptEditor("Setting up layer "+str(i)+": "+l)
+        groupParam = lightMixerNode.getParam(l)
+        if groupParam is None:
+            groupParam = lightMixerNode.createGroupParam(l, l.replace("soda_", ""))
+            groupParam.setOpened(True)
+            lightMixerParams.addParam(groupParam)
+        param = lightMixerNode.getParam(l+"_col")
+        if param is None:
+            param = lightMixerNode.createColorParam(l+"_col", "Color", False)
+            param.setMinimum(0)
+            param.setDisplayMaximum(1)
+            param.set(1, 1, 1, 1)
+            param.setDefaultValue(1, 0)
+            param.setDefaultValue(1, 1)
+            param.setDefaultValue(1, 2)
+            groupParam.addParam(param)
+        param = lightMixerNode.getParam(l+"_int")
+        if param is None:
+            param = lightMixerNode.createDoubleParam(l+"_int", "Intensity")
+            param.setMinimum(0)
+            param.setDisplayMaximum(10)
+            param.set(1)
+            param.setDefaultValue(1)
+            groupParam.addParam(param)
         position = (basePos[0]+(i-0.5*numLayers)*hSpacing, basePos[1]+vSpacing)
-        shuffle = setupLight(l, position, lightMixerInput, lightMixerNode)
+        lightOutNode = setupLight(l, position, lightMixerInput, lightMixerNode)
         # and connect to the merge node
-        mergeNode.connectInput(mergeNodeInput, shuffle)
+        mergeNode.connectInput(mergeNodeInput, lightOutNode)
         mergeNodeInput += 1
         if mergeNodeInput == 2:
             mergeNodeInput += 1  # Skip the mask input
+    lightMixerNode.refreshUserParamsGUI()

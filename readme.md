@@ -10,7 +10,13 @@ The add-on adds a new panel to the output tab of the property editor.
 
 It consists only of 2 actions to trigger. The first one prepares the blender scene to render a layer for each light
 in the scene. The second one launches Natron and sets up a comp, that allows to tweak each light layer individually
-and thus adjust the lighting without re-rendering.
+and thus adjust the lighting without re-rendering. For the second action it's possible to choose to update an existing
+comp (Update Natron) or to create a completely new comp (Recreate Natron).
+Then updating an existing comp, the add-on searches for a Natron file in the directory specified for compositing from
+the preferences. The Natron project then needs to be named according to the blender scene. Version numbers are searched
+backwards until an existing version is being found. So if your blender scene is called ```myHouse03.blend```, the add-on
+searches for ```myHouse03.ntp```, ```myHouse02.ntp```, ```myHouse01.ntp```, ```myHouse00.ntp```
+and ```myHouse.ntp``` in that order. If one of these Natron projects is being found, this is being loaded and updated.
 
 ## Workflow
 ### Preparing the scene

@@ -37,7 +37,8 @@ bl_info = {
 
 classes = (
     ops.CreateViewLayers,
-    ops.StartNatron,
+    ops.UpdateNatron,
+    ops.RecreateNatron,
     preferences.Preferences,
     preferences_panel.PreferencesPanel,
     control_panel.SodaMainPanel

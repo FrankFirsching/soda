@@ -34,6 +34,13 @@ def get_instance(context):
 class Preferences(PropertyGroup):
     """ The preferences object for the soda add-on """
     natron_executable: StringProperty(name="Natron executable",
-                                      description="The installation path of Natron.",
+                                      description="The installation path of Natron (use an absolute path, so it "+
+                                                  "works for every project).",
                                       subtype="FILE_PATH",
                                       options=set())
+    project_comp_dir: StringProperty(name="Compositing projects directory",
+                                     default="//../compositing/",
+                                     description="The directory, where the Natron projects should be stored (use a " +
+                                                 "relative path, so your projects are located nearby your blender " +
+                                                 "scenes).",
+                                     subtype="DIR_PATH", options=set())

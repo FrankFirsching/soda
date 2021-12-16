@@ -35,15 +35,28 @@ class CreateViewLayers(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class StartNatron(bpy.types.Operator):
+class UpdateNatron(bpy.types.Operator):
     """Start natron and update the compositing graph"""
-    bl_idname = "soda.start_natron"
-    bl_label = "SODA: Start Natron"
+    bl_idname = "soda.update_natron"
+    bl_label = "SODA: Update Natron"
     bl_options = {'REGISTER'}
 
     def __init__(self):
         pass
 
     def execute(self, context):
-        natron.setupComp(context)
+        natron.setupComp(context, True)
+        return {'FINISHED'}
+
+class RecreateNatron(bpy.types.Operator):
+    """Start natron and update the compositing graph"""
+    bl_idname = "soda.recreate_natron"
+    bl_label = "SODA: Recreate Natron"
+    bl_options = {'REGISTER'}
+
+    def __init__(self):
+        pass
+
+    def execute(self, context):
+        natron.setupComp(context, False)
         return {'FINISHED'}
