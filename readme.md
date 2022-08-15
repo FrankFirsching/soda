@@ -21,19 +21,17 @@ and ```myHouse.ntp``` in that order. If one of these Natron projects is being fo
 ## Workflow
 ### Preparing the scene
 
-The "SODA: Create light groups" action prepares the blender scene. In blender only collections can be enabled or disabled
-for specific view layers. Thus this add-on ensures, that each light is within its own collection.
-Basically it rearranges the following scene-graph:
+The "SODA: Create light groups" action prepares the blender scene. This add-on ensures, that each light is captured
+within its own light group. Basically the following scene-graph:
 
 ![lights_source](images/lights_source_scene.png)
 
-into this:
+results in the definition of the following light groups:
 
-![lights_adapted](images/lights_adapted_scene.png)
+![lights_adapted](images/light_groups_adapted_scene.png)
 
-It then creates specific view-layers and enables for each one the respective light, while turning all others off. A
-specific view-layer will be created for the world HDRI. A blender-side compositing network is also being created in
-order to save out a multi-layer exr file containing all light layers with their respective naming.
+A specific light group will also be created for the world HDRI. A blender-side compositing network is also being created
+in order to save out a multi-layer exr file containing all light layers with their respective naming.
 
 ### Rendering
 
