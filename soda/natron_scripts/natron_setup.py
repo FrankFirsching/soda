@@ -65,7 +65,7 @@ def getLayers(reader):
     usedLayers = []
     for x in allLayers:
         layerName = x.getLayerName()
-        if layerName.startswith("soda_"):
+        if "soda_" in layerName:
             usedLayers.append(layerName)
     return usedLayers
 
@@ -147,7 +147,7 @@ def setupComp(exrFile, sourceFile):
     # Remove the old parameters of lights, that might have been deleted.
     for p in lightMixerNode.getParams():
         layer_name = p.getScriptName()
-        if not layer_name.startswith("soda_"):
+        if "soda_" not in layer_name:
             continue
         if layer_name.endswith("col") or layer_name.endswith("_int"):
             layer_name = layer_name[:-4]

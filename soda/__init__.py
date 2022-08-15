@@ -27,8 +27,8 @@ bl_info = {
     "name": "soda",
     "author": "Frank Firsching",
     "description": "A bridge to the compositing application Natron",
-    "blender": (3, 0, 0),
-    "version": (0, 1, 0),
+    "blender": (3, 2, 0),
+    "version": (0, 2, 0),
     "location": "",
     "doc_url": "https://github.com/FrankFirsching/soda",
     "warning": "",
@@ -36,7 +36,7 @@ bl_info = {
 }
 
 classes = (
-    ops.CreateViewLayers,
+    ops.CreateLightGroups,
     ops.UpdateNatron,
     ops.RecreateNatron,
     preferences.Preferences,

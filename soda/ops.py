@@ -16,22 +16,22 @@
 # <pep8 compliant>
 
 import bpy
-from . import view_layers
+from . import core
 from . import natron
 
-class CreateViewLayers(bpy.types.Operator):
+class CreateLightGroups(bpy.types.Operator):
     """Create view layers for each light in the scene"""
-    bl_idname = "soda.create_view_layers"
-    bl_label = "SODA: Create view layers"
+    bl_idname = "soda.create_light_groups"
+    bl_label = "SODA: Create light groups"
     bl_options = {'REGISTER', 'UNDO'}
 
     def __init__(self):
         pass
 
     def execute(self, context):
-        view_layers.setup_global_soda_settings(context)
-        layers = view_layers.update_view_layers(context.scene)
-        view_layers.create_comp_network(context.scene, layers)
+        core.setup_global_soda_settings(context)
+        core.update_light_groups(context.scene, context.view_layer)
+        core.create_comp_network_light_groups(context.scene)
         return {'FINISHED'}
 
 

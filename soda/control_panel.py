@@ -27,7 +27,7 @@ class SodaPanel:
 
 
 class SodaMainPanel(SodaPanel, bpy.types.Panel):
-    """ The main painticle panel, shown in the tool settings """
+    """ The main soda panel, shown in the tool settings """
     bl_label = "Soda"
     bl_idname = "SODA_PT_main_panel"
 
@@ -37,7 +37,7 @@ class SodaMainPanel(SodaPanel, bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator(ops.CreateViewLayers.bl_idname)
+        layout.operator(ops.CreateLightGroups.bl_idname)
         row = layout.row(align=True)
         row.operator(ops.UpdateNatron.bl_idname)
         row.operator(ops.RecreateNatron.bl_idname)

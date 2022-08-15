@@ -70,7 +70,7 @@ def rendered_file_path(context):
     if rendered_file.startswith("//"):
         rendered_file = os.path.join(os.path.dirname(bpy.data.filepath), rendered_file[2:])
         rendered_file = os.path.abspath(rendered_file)
-    if context.scene.render.use_file_extension:
+    if context.scene.render.use_file_extension and not rendered_file.endswith(context.scene.render.file_extension):
         # The output node still has the same format as the global, so we ask that one, since the node itself
         # doesn't provide the extension
         rendered_file += context.scene.render.file_extension
